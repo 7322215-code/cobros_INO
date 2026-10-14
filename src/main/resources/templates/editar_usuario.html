@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Editar Usuario</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body class="center-page">
+
+<div class="card" style="width:100%; max-width:520px;">
+
+    <h1 class="title-gradient" style="text-align:center; margin-bottom:22px;">
+        ✏️ Editar Usuario
+    </h1>
+
+    <div th:if="${error}" class="error">
+        <span th:text="${error}"></span>
+    </div>
+
+    <form id="formEditar" th:action="@{/usuarios/admin/actualizar}" method="post">
+
+        <input type="hidden" name="id" th:value="${usuarioEditar.id}">
+
+        <div style="margin-bottom:14px;">
+            <input type="text" id="username" name="username"
+                   th:value="${usuarioEditar.username}" placeholder="Usuario" required>
+        </div>
+
+        <div style="margin-bottom:14px;">
+            <input type="password" id="password" name="password" placeholder="Nueva contraseña">
+        </div>
+
+        <div style="margin-bottom:14px;">
+            <input type="password" id="confirmar" name="confirmarPassword" placeholder="Confirmar contraseña">
+        </div>
+
+        <div style="margin-bottom:20px;">
+            <select name="rol">
+                <option value="admin"    th:selected="${usuarioEditar.rol == 'admin'}">admin</option>
+                <option value="cajero"   th:selected="${usuarioEditar.rol == 'cajero'}">cajero</option>
+                <option value="director" th:selected="${usuarioEditar.rol == 'director'}">director</option>
+                <option value="docente"  th:selected="${usuarioEditar.rol == 'docente'}">docente</option>
+                <option value="CDE"      th:selected="${usuarioEditar.rol == 'CDE'}">CDE</option>
+            </select>
+        </div>
+
+        <button type="button" class="btn btn-block" onclick="confirmarEdicion()">
+            💾 Guardar Cambios
+        </button>
+
+    </form>
+
+</div>
+
+<!-- MODAL -->
+<div id="modalConfirmacion" class="modal">
+    <div class="modal-content">
+        <h2 class="title-gradient" id="tituloModal">Confirmación</h2>
+        <p id="mensajeModal"></p>
+        <div class="modal-buttons">
+            <button type="button" class="btn btn-cancel" onclick="cerrarModal()">Cancelar</button>
+            <button type="button" class="btn btn-confirm" id="btnConfirmar">Confirmar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let accionPendiente = null;
+
+    function abrirModal(mensaje, callback){
+        document.getElementById("mensajeModal").innerText = mensaje;
+        document.getElementById("modalConfirmacion").style.display = "flex";
+        accionPendiente = callback;
+    }
+    function cerrarModal(){
+        document.getElementById("modalConfirmacion").style.display = "none";
+        accionPendiente = null;
+    }
+    document.getElementById("btnConfirmar").addEventListener("click", function(){
+        if(accionPendiente) accionPendiente();
+        cerrarModal();
+    });
+
+    function validarFormulario(){
+        let username = document.getElementById("username").value.trim();
+        let password = document.getElementById("password").value.trim();
+        let confirmar = document.getElementById("confirmar").value.trim();
+
+        if(username === ""){
+            abrirModal("El usuario no puede estar vacío", function(){});
+            return false;
+        }
+        if(password !== ""){
+            if(password !== confirmar){
+                abrirModal("Las contraseñas no coinciden", function(){});
+                return false;
+            }
+            if(password.length < 4){
+                abrirModal("La contraseña debe tener mínimo 4 caracteres", function(){});
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function confirmarEdicion(){
+        if(!validarFormulario()) return;
+        abrirModal("¿Deseas guardar los cambios del usuario?", function(){
+            document.getElementById("formEditar").submit();
+        });
+    }
+</script>
+
+</body>
+</html>

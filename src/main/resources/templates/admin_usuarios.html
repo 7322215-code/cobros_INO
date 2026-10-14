@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Administración de Usuarios</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body>
+
+<div th:if="${param.success != null}" class="toast">
+    <span th:if="${param.success[0] == 'created'}">✅ Usuario creado correctamente</span>
+    <span th:if="${param.success[0] == 'updated'}">✅ Usuario actualizado correctamente</span>
+    <span th:if="${param.success[0] == 'deleted'}">✅ Usuario eliminado correctamente</span>
+</div>
+
+<div class="main" style="margin-left:0; max-width:1200px; margin:30px auto;">
+
+    <h1 class="title-gradient" style="margin-bottom:25px;">👑 Administración de Usuarios</h1>
+
+    <div th:if="${error}" class="error">
+        <span th:text="${error}"></span>
+    </div>
+
+    <!-- FORMULARIO -->
+    <div class="card" style="margin-bottom:30px;">
+
+        <h2 class="title-gradient"
+            th:text="${usuarioObj != null and usuarioObj.id != null ? 'Editar Usuario' : 'Crear Usuario'}"></h2>
+
+        <form id="formUsuario"
+              style="margin-top:20px;"
+              th:action="${usuarioObj != null and usuarioObj.id != null}
+              ? @{/usuarios/admin/actualizar}
+              : @{/usuarios/admin/crear}"
+              method="post">
+
+            <input type="hidden" name="id"
+                   th:value="${usuarioObj != null ? usuarioObj.id : ''}">
+
+            <div class="cards" style="grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap:18px;">
+
+                <input type="text" name="username" id="username"
+                       placeholder="Usuario"
+                       th:value="${usuarioObj != null ? usuarioObj.username : ''}"
+                       required>
+
+                <input type="password" name="password" id="password"
+                       placeholder="Nueva contraseña">
+
+                <input type="password" name="confirmarPassword" id="confirmarPassword"
+                       placeholder="Confirmar contraseña">
+
+                <select name="rol">
+                    <option value="admin"    th:selected="${usuarioObj != null and usuarioObj.rol == 'admin'}">admin</option>
+                    <option value="cajero"   th:selected="${usuarioObj != null and usuarioObj.rol == 'cajero'}">cajero</option>
+                    <option value="director" th:selected="${usuarioObj != null and usuarioObj.rol == 'director'}">director</option>
+                    <option value="docente"  th:selected="${usuarioObj != null and usuarioObj.rol == 'docente'}">docente</option>
+                    <option value="CDE"      th:selected="${usuarioObj != null and usuarioObj.rol == 'CDE'}">CDE</option>
+                </select>
+
+                <select name="activo">
+                    <option value="true"  th:selected="${usuarioObj == null or usuarioObj.activo == null or usuarioObj.activo}">Activo</option>
+                    <option value="false" th:selected="${usuarioObj != null and usuarioObj.activo != null and !usuarioObj.activo}">Inactivo</option>
+                </select>
+
+            </div>
+
+            <button type="button" class="btn btn-save" style="margin-top:22px;"
+                    onclick="confirmarGuardar()">
+                💾 Guardar Usuario
+            </button>
+
+        </form>
+    </div>
+
+    <!-- TABLA -->
+    <div class="card">
+        <h2 class="title-gradient" style="margin-bottom:15px;">Usuarios Registrados</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Usuario</th>
+                    <th>Rol</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="u : ${usuarios}">
+                    <td th:text="${u.id}"></td>
+                    <td th:text="${u.username}"></td>
+                    <td th:text="${u.rol}"></td>
+                    <td>
+                        <span class="badge"
+                              th:classappend="${u.activo} ? 'badge-ok' : 'badge-warn'"
+                              th:text="${u.activo == true ? 'Activo' : 'Inactivo'}"></span>
+                    </td>
+                    <td>
+                        <div style="display:flex; justify-content:center; gap:8px;">
+                            <a th:href="@{/usuarios/admin/editar/{id}(id=${u.id})}">
+                                <button type="button" class="btn btn-update" style="padding:8px 12px;">✏️</button>
+                            </a>
+                            <button type="button"
+                                    class="btn btn-delete" style="padding:8px 12px;"
+                                    th:attr="data-url=@{/usuarios/admin/eliminar/{id}(id=${u.id})}"
+                                    onclick="abrirModalEliminar(this.getAttribute('data-url'))">
+                                🗑️
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<!-- MODAL -->
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <h2 class="title-gradient">Confirmación</h2>
+        <p id="mensajeModal"></p>
+        <div class="modal-buttons">
+            <button type="button" class="btn btn-cancel" onclick="cerrarModal()">Cancelar</button>
+            <button type="button" class="btn btn-confirm" id="btnConfirmar">Confirmar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let accionPendiente = null;
+
+    function abrirModal(mensaje, callback){
+        document.getElementById("mensajeModal").innerText = mensaje;
+        document.getElementById("modal").style.display = "flex";
+        accionPendiente = callback;
+    }
+    function cerrarModal(){
+        document.getElementById("modal").style.display = "none";
+        accionPendiente = null;
+    }
+    document.getElementById("btnConfirmar").addEventListener("click", function(){
+        if(accionPendiente) accionPendiente();
+        cerrarModal();
+    });
+
+    function validarFormulario(){
+        let username = document.getElementById("username").value.trim();
+        let password = document.getElementById("password").value.trim();
+        let confirmar = document.getElementById("confirmarPassword").value.trim();
+
+        if(username === ""){
+            abrirModal("El usuario no puede estar vacío", function(){});
+            return false;
+        }
+
+        let editando = document.querySelector("input[name='id']").value !== "";
+
+        if(!editando && (password === "" || confirmar === "")){
+            abrirModal("La contraseña es obligatoria", function(){});
+            return false;
+        }
+
+        if(password !== "" || confirmar !== ""){
+            if(password !== confirmar){
+                abrirModal("Las contraseñas no coinciden", function(){});
+                return false;
+            }
+            if(password.length < 4){
+                abrirModal("La contraseña debe tener mínimo 4 caracteres", function(){});
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function confirmarGuardar(){
+        if(!validarFormulario()) return;
+        abrirModal("¿Deseas guardar los cambios del usuario?", function(){
+            document.getElementById("formUsuario").submit();
+        });
+    }
+
+    function abrirModalEliminar(url){
+        abrirModal("¿Deseas eliminar este usuario?", function(){
+            window.location.href = url;
+        });
+    }
+</script>
+
+</body>
+</html>

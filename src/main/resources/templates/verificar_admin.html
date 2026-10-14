@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Verificación Admin</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body class="center-page">
+
+<div class="card" style="width:100%; max-width:420px;">
+
+    <h2 class="title-gradient" style="text-align:center; margin-bottom:22px;">
+        🔐 Verificación Administrativa
+    </h2>
+
+    <div th:if="${error}" class="error">
+        <span th:text="${error}"></span>
+    </div>
+
+    <form th:action="@{/usuarios/admin/verificar}" method="post">
+
+        <div style="margin-bottom:20px;">
+            <label>Contraseña de administrador</label>
+            <input type="password" name="password" placeholder="Ingrese su contraseña" required>
+        </div>
+
+        <button type="submit" class="btn btn-block">
+            ✅ Verificar acceso
+        </button>
+
+    </form>
+
+</div>
+
+</body>
+</html>

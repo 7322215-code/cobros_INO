@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Iniciar Sesión | Cobros INO</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffd6e7, #ffeaf2, #f8c8dc);
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 420px;
+            background: white;
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: 0 15px 40px rgba(190, 80, 120, 0.25);
+            text-align: center;
+        }
+
+        .login-icon {
+            width: 85px;
+            height: 85px;
+            margin: 0 auto 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            background: #f8b6cf;
+            font-size: 42px;
+        }
+
+        .title-gradient {
+            color: #c2185b;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            color: #888;
+            margin-bottom: 30px;
+        }
+
+        .form-label { color: #555; }
+
+        .form-control {
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #e5a5bd;
+            margin-bottom: 15px;
+        }
+
+        .form-control:focus {
+            border-color: #d81b60;
+            box-shadow: 0 0 0 0.2rem rgba(216, 27, 96, 0.15);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 10px;
+            background: #d81b60;
+            font-weight: bold;
+            font-size: 16px;
+            color: white;
+        }
+
+        .btn-login:hover { background: #ad1457; }
+
+        .error-msg {
+            color: #842029;
+            background-color: #f8d7da;
+            border: 1px solid #f5c2c7;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .success-msg {
+            color: #0f5132;
+            background-color: #d1e7dd;
+            border: 1px solid #badbcc;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .footer {
+            margin-top: 25px;
+            font-size: 12px;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+
+        <div class="login-icon">🔐</div>
+
+        <h2 class="title-gradient">Bienvenido</h2>
+        <p class="subtitle">Sistema de Cobros INO</p>
+
+        <!-- Mensaje de error del controlador -->
+        <div th:if="${error}" class="error-msg" th:text="${error}"></div>
+
+        <!-- Mensaje de logout exitoso -->
+        <div th:if="${param.logout}" class="success-msg">
+            Sesión cerrada correctamente
+        </div>
+
+        <form th:action="@{/usuarios/login}" method="post">
+
+            <div class="text-start">
+                <label class="form-label fw-bold">Usuario</label>
+                <input type="text" name="username" class="form-control"
+                       placeholder="Ingresa tu usuario" required autofocus>
+            </div>
+
+            <div class="text-start">
+                <label class="form-label fw-bold">Contraseña</label>
+                <input type="password" name="password" class="form-control"
+                       placeholder="Ingresa tu contraseña" required>
+            </div>
+
+            <button type="submit" class="btn btn-login mt-3">
+                🔑 Ingresar al sistema
+            </button>
+
+        </form>
+
+        <div class="footer">© 2026 Cobros INO</div>
+
+    </div>
+
+</body>
+</html>

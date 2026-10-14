@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Dashboard | Cobros INO</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #f8c8dc, #ffeaf2, #ffd6e7);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .navbar-custom {
+            background: #d81b60;
+            color: white;
+            padding: 15px 25px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .navbar-custom h2 { margin: 0; font-weight: bold; }
+        .welcome-box {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(190, 80, 120, 0.15);
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 20px rgba(190, 80, 120, 0.15);
+            transition: transform 0.2s;
+            height: 100%;
+            text-align: center;
+        }
+        .stat-card:hover { transform: translateY(-5px); }
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #c2185b;
+            margin: 10px 0;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .stat-icon { font-size: 40px; }
+        .card-menu {
+            background: white;
+            border: none;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 20px rgba(190, 80, 120, 0.15);
+            transition: transform 0.2s, box-shadow 0.2s;
+            height: 100%;
+        }
+        .card-menu:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(190, 80, 120, 0.3);
+        }
+        .card-menu .icon { font-size: 52px; margin-bottom: 15px; }
+        .card-menu h4 { color: #c2185b; font-weight: bold; }
+        .card-menu p { color: #666; font-size: 14px; }
+        .btn-ino {
+            background: #d81b60;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 28px;
+            font-weight: bold;
+        }
+        .btn-ino:hover { background: #ad1457; color: white; }
+        .btn-logout {
+            background: white;
+            color: #d81b60;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 18px;
+            font-weight: bold;
+        }
+        .btn-logout:hover { background: #ffeaf2; color: #ad1457; }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <div class="navbar-custom d-flex justify-content-between align-items-center">
+        <h2>💳 Cobros INO</h2>
+        <a th:href="@{/usuarios/logout}" class="btn btn-logout">🚪 Cerrar sesión</a>
+    </div>
+
+    <div class="container">
+
+        <!-- BIENVENIDA -->
+        <div class="welcome-box">
+            <h2 style="color:#c2185b;">👋 Bienvenido al Dashboard</h2>
+            <p style="color:#666; margin:0;">
+                Usuario:
+                <strong th:text="${usuario != null ? usuario.username : 'Invitado'}">admin</strong>
+                |
+                Rol:
+                <span class="badge bg-danger"
+                      th:text="${usuario != null ? usuario.rol : 'N/A'}">admin</span>
+            </p>
+        </div>
+
+        <!-- ESTADÍSTICAS -->
+        <h4 style="color:#c2185b; margin-bottom: 20px;">📊 Estadísticas</h4>
+        <div class="row g-4 mb-4">
+
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-number" th:text="${totalUsuarios}">0</div>
+                    <div class="stat-label">Usuarios</div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-number" th:text="${totalPagos}">0</div>
+                    <div class="stat-label">Pagos Totales</div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-number" th:text="${pagosPagados}">0</div>
+                    <div class="stat-label">Pagados</div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon">⏳</div>
+                    <div class="stat-number" th:text="${pagosPendientes}">0</div>
+                    <div class="stat-label">Pendientes</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ACCIONES RÁPIDAS (solo 2 tarjetas) -->
+        <h4 style="color:#c2185b; margin-bottom: 20px;">🚀 Acciones Rápidas</h4>
+        <div class="row g-4 justify-content-center">
+
+            <div class="col-md-6">
+                <div class="card-menu text-center">
+                    <div class="icon">👥</div>
+                    <h4>Usuarios</h4>
+                    <p>Administrar usuarios del sistema.</p>
+                    <a th:href="@{/usuarios/panel-admin}" class="btn btn-ino">Administrar</a>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card-menu text-center">
+                    <div class="icon">💰</div>
+                    <h4>Pagos</h4>
+                    <p>Registrar y consultar pagos.</p>
+                    <a th:href="@{/pagos}" class="btn btn-ino">Ver pagos</a>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+</html>
